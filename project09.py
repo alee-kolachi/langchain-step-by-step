@@ -1,4 +1,4 @@
-# project12_simple_chat.py
+# project9_simple_chat.py
 
 from langchain_groq import ChatGroq
 from langchain.agents import create_agent

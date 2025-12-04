@@ -1,4 +1,4 @@
-"""Project 7 — Simple RAG Chain
+"""Project 6 — Simple RAG Chain
 
 Goal: Combine retrieval + LLM into one flow."""
 

@@ -1,4 +1,4 @@
-"""Project 6 — Vector Store Retrieval
+"""Project 5 — Vector Store Retrieval
 
 Goal: Use embeddings + FAISS for smarter retrieval."""
 

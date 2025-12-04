@@ -1,4 +1,4 @@
-"""Project 5 — Mini Knowledge Base
+"""Project 4 — Mini Knowledge Base
 
 Goal: Store a few text snippets and retrieve manually."""
 

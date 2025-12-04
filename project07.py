@@ -1,4 +1,4 @@
-"""Project 8 — Basic Tool Agent
+"""Project 7 — Basic Tool Agent
 
 Goal: Let LLM call a Python function."""
 

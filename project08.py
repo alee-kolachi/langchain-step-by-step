@@ -1,4 +1,4 @@
-"""Project 9 — Multi-Tool Agent (Add + Multiply + Retrieve)"""
+"""Project 8 — Multi-Tool Agent (Add + Multiply + Retrieve)"""
 
 from langchain_groq import ChatGroq
 from langchain.tools import tool

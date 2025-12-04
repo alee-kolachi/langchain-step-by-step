@@ -1,4 +1,4 @@
-"""Project 4 — Two-Step Chain
+"""Project 3 — Two-Step Chain
 
 Goal: Run one output into another prompt."""
 
