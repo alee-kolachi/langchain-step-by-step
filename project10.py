@@ -1,17 +1,23 @@
-"""Project 10 — Agent with Short-Term Memory (Thread-Based)"""
+# -----------------------------
+# Project 10
+# Title: Agent with Short-Term Memory (Thread-Based)
+# Description: Demonstrates an LLM agent that uses tools and maintains
+#              short-term memory via thread-based checkpointing.
+# -----------------------------
 
-from langchain_groq import ChatGroq
-from langchain.tools import tool
-from langchain.agents import create_agent
-from langchain.agents.middleware import before_model
-from langchain.messages import RemoveMessage
-from langgraph.checkpoint.memory import InMemorySaver
-from langchain_core.runnables import RunnableConfig
-from dotenv import load_dotenv
+from langchain_groq import ChatGroq                     # LLM wrapper
+from langchain.tools import tool                        # Tool decorator
+from langchain.agents import create_agent               # Agent factory
+from langchain.agents.middleware import before_model    # Message middleware (optional trimming)
+from langchain.messages import RemoveMessage            # Used for message deletion
+from langgraph.checkpoint.memory import InMemorySaver   # In-memory checkpoint store
+from langchain_core.runnables import RunnableConfig     # Config for threaded execution
+from dotenv import load_dotenv                          # Load environment variables
 
-load_dotenv()
+load_dotenv()                                            # Initialize env variables
 
-#Step 1 : Tools
+# Step 1: Define tools
+
 @tool
 def add_numbers(a: int, b: int) -> int:
     """Add two numbers and return the sum"""
@@ -22,20 +28,22 @@ def multiply_two_numbers(a: int, b: int) -> int:
     """Multiply two numbers and return result"""
     return a * b
 
-#Step 2: Initialize LLM
+# Step 2: Initialize the language model
 llm = ChatGroq(model="openai/gpt-oss-120b")
 
-#Step 3: Middleware to trim messages
+# Step 3: Middleware placeholder (not trimming anything here)
+# You could implement trimming logic if needed.
 
-
-#Step 4: Create agent with memory
+# Step 4: Create the agent with memory enabled via InMemorySaver
 agent = create_agent(
     model=llm,
     tools=[add_numbers, multiply_two_numbers],
-    checkpointer=InMemorySaver(),
+    checkpointer=InMemorySaver(),  # Enables short-term, thread-based memory
 )
 
-#Step 5: Thread config for short-term memory
+# Step 5: Thread configuration for memory
+# Memory persists within this thread ID
+thread_config = {"configurable": {"thread_id": "1"}}
 
 # Step 6: Multi-turn conversation
 conversation = [
@@ -48,8 +56,12 @@ conversation = [
 for user_input in conversation:
     result = agent.invoke(
         {"messages": [{"role": "user", "content": user_input}]},
-        {"configurable": {"thread_id": "1"}}
+        thread_config
     )
+    
+    # The agent's latest response is the last message
+    reply = result["messages"][-1].content
+
     print("User:", user_input)
-    print("Agent:", result["messages"][-1].content)
+    print("Agent:", reply)
     print("---")

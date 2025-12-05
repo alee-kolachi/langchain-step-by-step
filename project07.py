@@ -1,27 +1,35 @@
-"""Project 7 — Basic Tool Agent
+# -----------------------------
+# Project 07
+# Title: Basic Tool Agent
+# Description: Defines a simple Python tool, allows an LLM agent to call it,
+#              and prints the final AI response.
+# -----------------------------
 
-Goal: Let LLM call a Python function."""
+from langchain_groq import ChatGroq                    # LLM wrapper
+from langchain.tools import tool                       # Decorator to turn functions into tools
+from langchain.agents import create_agent              # Creates an agent that can use tools
+from langchain.messages import AIMessage               # Message class to identify AI output
+from dotenv import load_dotenv                         # Load environment variables
 
-from langchain_groq import ChatGroq
-from langchain.tools import tool
-from langchain.agents import create_agent
-from langchain.messages import AIMessage
-from dotenv import load_dotenv
+load_dotenv()                                           # Load .env settings
 
-load_dotenv()
-
+# Define a simple tool that adds two integers
 @tool
 def add_numbers(a: int, b: int) -> int:
     """Add two integers together."""
-    return a+b
+    return a + b
 
+# Initialize the LLM
 llm = ChatGroq(model="llama-3.1-8b-instant")
+
+# Create an agent that knows it can use the add_numbers tool
 agent = create_agent(
     model=llm,
     tools=[add_numbers],
     system_prompt="You can use a tool to add two numbers."
 )
 
+# Run the agent with a user query
 result = agent.invoke(
     {
         "messages": [
@@ -33,8 +41,7 @@ result = agent.invoke(
     }
 )
 
+# Extract and print only the AI messages from the result
 for msg in result["messages"]:
     if isinstance(msg, AIMessage):
         print(msg.content)
-
-        
