@@ -1,4 +1,9 @@
-"""Project 10 — Agent with Short-Term Memory (Thread-Based)"""
+# -----------------------------
+# Project 10
+# Title: Agent with Short-Term Memory (Thread-Based)
+# Description: Demonstrates an LLM agent that uses tools and maintains
+#              short-term memory via thread-based checkpointing.
+# -----------------------------
 
 from langchain_groq import ChatGroq
 from langchain.tools import tool
