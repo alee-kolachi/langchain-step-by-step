@@ -1,4 +1,11 @@
+"""
+Project 12 — Agent + Pydantic Structured Output (Updated LangChain)
 
+What this project demonstrates:
+- Tool calling (fetch_weather)
+- Modern structured output using PydanticOutputParser
+- ChatGroq with latest LangChain agent API
+"""
 
 from dotenv import load_dotenv
 import json
