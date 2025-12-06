@@ -1,11 +1,4 @@
-"""
-Project 12 — Agent + Pydantic Structured Output (Updated LangChain)
 
-What this project demonstrates:
-- Tool calling (fetch_weather)
-- Modern structured output using PydanticOutputParser
-- ChatGroq with latest LangChain agent API
-"""
 
 from dotenv import load_dotenv
 import json
@@ -28,18 +21,21 @@ load_dotenv()
 @tool
 def fetch_weather(city: str) -> str:
     """
-    Mock weather tool. Returns JSON string with basic weather info.
-    Replace this with a real API call if needed.
+    Simple mock tool that returns JSON weather data based on a city name.
+    Real API integration can replace this function later.
     """
     city_lower = city.lower()
 
+    # Basic branching to simulate different weather responses
     if "lahore" in city_lower:
         data = {"city": city, "temp_c": 28, "condition": "Cloudy"}
     elif "london" in city_lower:
         data = {"city": city, "temp_c": 12, "condition": "Rain"}
     else:
+        # Default weather for unspecified cities
         data = {"city": city, "temp_c": 22, "condition": "Clear"}
 
+    # Tools must always return strings (often JSON strings)
     return json.dumps(data)
 
 
@@ -48,11 +44,16 @@ def fetch_weather(city: str) -> str:
 # ---------------------------------------------------------
 
 class WeatherOutput(BaseModel):
+    """
+    Defines the exact JSON structure the agent must return.
+    The model enforces the fields and types in the final output.
+    """
     city: str = Field(..., description="The city requested")
     temp_c: int = Field(..., description="Temperature in Celsius")
     condition: str = Field(..., description="Weather condition")
     advice: str = Field(..., description="Short advice for the user")
 
+# Parser that turns model output into this structured Pydantic object
 parser = PydanticOutputParser(pydantic_object=WeatherOutput)
 
 
@@ -60,6 +61,7 @@ parser = PydanticOutputParser(pydantic_object=WeatherOutput)
 # 3. Initialize latest LLM
 # ---------------------------------------------------------
 
+# ChatGroq wrapper for Llama 3.1 model
 llm = ChatGroq(model="llama-3.1-8b-instant")
 
 
@@ -67,6 +69,10 @@ llm = ChatGroq(model="llama-3.1-8b-instant")
 # 4. Create Agent (LATEST API)
 # ---------------------------------------------------------
 
+# System prompt that forces:
+# - mandatory tool usage
+# - mandatory JSON output
+# - strict adherence to the Pydantic format
 system_prompt = f"""
 You are a weather assistant.
 
@@ -83,6 +89,7 @@ Only output in the following format:
 Output must be valid JSON AND FOLLOWS THE FORMAT NOTHIGN ELSE REQUIRED.
 """
 
+# Creates an agent with tool-calling capabilities and custom prompt
 agent = create_agent(
     model=llm,
     tools=[fetch_weather],
@@ -95,6 +102,10 @@ agent = create_agent(
 # ---------------------------------------------------------
 
 def run_demo():
+    """
+    Sends multiple sample queries to the agent, prints raw JSON output,
+    then parses it into a Pydantic model for structured usage.
+    """
     queries = [
         "What's the weather in Lahore today?",
         "Tell me weather for London with advice.",
@@ -105,15 +116,17 @@ def run_demo():
         print("\n" + "=" * 60)
         print("USER:", q)
 
+        # Invoke agent with message-based input format
         result = agent.invoke({"messages": [{"role": "user", "content": q}]})
 
+        # Extract only AI messages from agent output
         ai_messages = [m for m in result["messages"] if isinstance(m, AIMessage)]
-        final = ai_messages[-1].content
+        final = ai_messages[-1].content  # last AI message = final output
 
         print("\nRaw model output:")
         print(final)
 
-        # Parse into Pydantic object
+        # Attempt to parse JSON using the Pydantic parser
         try:
             parsed = parser.parse(final)
             print("\nParsed structured output:")
@@ -124,5 +137,6 @@ def run_demo():
         print("=" * 60)
 
 
+# Entry point
 if __name__ == "__main__":
     run_demo()
